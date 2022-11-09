@@ -1,12 +1,12 @@
 const express = require('express')
 const axios = require('axios');
-const nanoid = require('nanoid');
+const crypto = require('crypto');
 
 const app = express()
 const port = 3000
 
 app.get('/proxy-request', async (req, res) => {
-    const requestId = nanoid.nanoid(15);
+    const requestId = crypto.randomUUID();
     console.log(`[${requestId}] Receiving proxy request from ${req.hostname}`)
     const webhookTarget = req.query.webhook;
     const webhookMessage = req.query.message;
