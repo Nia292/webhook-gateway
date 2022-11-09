@@ -1,0 +1,20 @@
+name: Build Gateway
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: nelonoel/branch-name@v1.0.1
+      - name: Build & Push to Github Registry
+        uses: zenato/docker-action@v1.0.0
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: "docker.pkg.github.com"
+          repository: Nia292/webhook-gateway/webhook-gateway
+          tag: ${{env.BRANCH_NAME}}
