@@ -14,7 +14,7 @@ jobs:
         uses: zenato/docker-action@v1.0.0
         with:
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GH_TOKEN }}
           registry: "docker.pkg.github.com"
-          repository: Nia292/webhook-gateway/webhook-gateway
+          repository: nia292/webhook-gateway/webhook-gateway
           tag: ${{env.BRANCH_NAME}}
