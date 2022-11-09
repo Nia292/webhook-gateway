@@ -24,6 +24,7 @@ app.get('/proxy-request', async (req, res) => {
         res.send(JSON.stringify({error: 'Query parameter "message" not provided.'}));
         return;
     }
+    console.log(`[${requestId}] Message is ${webhookMessage}`)
     const discordRequest = {
         content: webhookMessage,
     };
