@@ -1,0 +1,8 @@
+# Exposes the gateway on port 8080, pulling the image from github container registry
+version: "3"
+services:
+  gateway:
+    image: ghcr.io/nia292/webhook-gateway/webhook-gateway:main
+    restart: unless-stopped
+    ports:
+      - "8080:3000"
