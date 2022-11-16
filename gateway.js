@@ -10,42 +10,49 @@ async function handleVersionOne(req, res, requestId, webhookMessage, webhookTarg
     const discordRequest = {
         content: webhookMessage,
     };
-    await axios.post(`https://discordapp.com/api/webhooks/${webhookTarget}`, discordRequest)
+    return await axios.post(`https://discordapp.com/api/webhooks/${webhookTarget}`, discordRequest)
         .then(response => {
-            console.log(response.data.url);
-            console.log(response.data.explanation);
+            res.status(200);
+            res.contentType("application/json");
+            console.log(`[${requestId}] Proxy done.`);
+            res.send(JSON.stringify({"result": 'ok'}));
+        }).catch(error => {
+            console.log(`[${requestId}] Error: ${error.message}`)
+            res.status(200);
+            res.send(JSON.stringify(error));
         })
-        .catch(error => {
-            throw error;
-        });
-    res.status(200);
-    res.contentType("application/json")
-    console.log(`[${requestId}] Proxy done.`)
-    res.send(JSON.stringify({"result": 'ok'}));
-    return true;
+}
+
+async function handleProxyRequest(req, res) {
+    const requestId = crypto.randomUUID();
+    try {
+        console.log(`[${requestId}] Receiving proxy request from ${req.socket.remoteAddress}`)
+        const webhookTarget = req.query.webhook;
+        const webhookMessage = req.query.message;
+        const version = req.query.twVersion;
+        if (!webhookTarget) {
+            console.log(`[${requestId}] Query parameter "webhook" not provided.`)
+            res.status(400)
+            res.contentType("application/json")
+            res.send(JSON.stringify({error: 'Query parameter "webhook" not provided.'}));
+            return;
+        }
+        if (!webhookMessage) {
+            console.log(`[${requestId}] Query parameter "message" not provided.`)
+            res.status(400)
+            res.contentType("application/json")
+            res.send(JSON.stringify({error: 'Query parameter "message" not provided.'}));
+            return;
+        }
+        return handleVersionOne(req, res, requestId, webhookMessage, webhookTarget, version);
+    } catch (e) {
+        console.error('Failed to proxy request', e);
+    }
+
 }
 
 app.get('/proxy-request', async (req, res) => {
-    const requestId = crypto.randomUUID();
-    console.log(`[${requestId}] Receiving proxy request from ${req.socket.remoteAddress}`)
-    const webhookTarget = req.query.webhook;
-    const webhookMessage = req.query.message;
-    const version = req.query.twVersion;
-    if (!webhookTarget) {
-        console.log(`[${requestId}] Query parameter "webhook" not provided.`)
-        res.status(400)
-        res.contentType("application/json")
-        res.send(JSON.stringify({error: 'Query parameter "webhook" not provided.'}));
-        return;
-    }
-    if (!webhookMessage) {
-        console.log(`[${requestId}] Query parameter "message" not provided.`)
-        res.status(400)
-        res.contentType("application/json")
-        res.send(JSON.stringify({error: 'Query parameter "message" not provided.'}));
-        return;
-    }
-    return handleVersionOne(req, res, requestId, webhookMessage, webhookTarget, version);
+    return handleProxyRequest(req, res)
 })
 
 app.listen(port, () => {
