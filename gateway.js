@@ -62,8 +62,8 @@ async function handleRPRRequest(req, res) {
     const requestId = crypto.randomUUID();
     try {
         console.log(`[${requestId}] Receiving proxy request from ${req.socket.remoteAddress}`)
-        const webhookId = req.query.webhookid;
-        const webhookToken = req.query.webhooktoken;
+        const webhookId = req.params.webhookId;
+        const webhookToken = req.params.webhookToken;
         if (!webhookId) {
             returnMandatoryParamMissing(res, 'webhookid', requestId);
         }
@@ -92,7 +92,7 @@ app.get('/proxy-request', async (req, res) => {
 })
 
 if (process.env.RPR_ENABLED) {
-    app.get('/rpr-proxy', async (req, res) => {
+    app.get('/rpr-proxy/:webhookId/:webhookToken', async (req, res) => {
         return handleRPRRequest(req, res);
     })
 }
