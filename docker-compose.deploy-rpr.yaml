@@ -1,0 +1,11 @@
+# Exposes the gateway on port 8080, pulling the image from github container registry
+version: "3"
+services:
+  gateway:
+    image: ghcr.io/nia292/webhook-gateway/webhook-gateway:main
+    restart: unless-stopped
+    environment:
+      - MONITORED_RPR_CHANNELS="1" # forward only global, add "2" for local
+      - RPR_ENABLED="true" # enable RPR gateway functionality
+    ports:
+      - "3000:3000"
