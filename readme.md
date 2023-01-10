@@ -25,3 +25,5 @@ install it, and then follow these steps:
 3. ``node gateway.js``
 
 And your gateway will be running on port 3000.
+
+## Enabling RPR
