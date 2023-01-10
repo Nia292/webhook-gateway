@@ -5,6 +5,10 @@ const crypto = require('crypto');
 const app = express()
 const port = 3000
 
+const MONITORED_RPR_CHANNELS = (process.env.RPR_CHANNELS || '')
+    .split(",")
+    .map(v => v.trim());
+
 function returnMandatoryParamMissing(res, paramName, requestId) {
     console.log(`[${requestId}] Query parameter "${paramName}" not provided.`)
     res.status(400)
@@ -73,6 +77,11 @@ async function handleRPRRequest(req, res) {
         const webhookTarget = `${webhookId}/${webhookToken}`;
         const message = req.query.message;
         const channel = req.query.channel;
+        // Don't want to log every channel for privacy reasons.
+        if (!MONITORED_RPR_CHANNELS.includes(channel)) {
+            console.log(`[${requestId}] Skipping message in RPR channel ${channel}`)
+            return
+        }
         const character = req.query.character;
         if (!message) {
             returnMandatoryParamMissing(res, 'message', requestId);
